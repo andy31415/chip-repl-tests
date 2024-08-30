@@ -6,4 +6,4 @@ async def commission_wifi(devCtrl, node_id):
 
 
 # OnNetwork is simple, so no separate helper is provided
-#    devCtrl.CommissionOnNetwork(node_id, 20202021)
+#    await devCtrl.CommissionOnNetwork(node_id, 20202021)

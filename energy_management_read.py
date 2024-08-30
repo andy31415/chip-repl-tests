@@ -7,7 +7,7 @@ import chip.clusters as Clusters
 
 
 async def commission_impl(devCtrl, node_id):
-    devCtrl.CommissionOnNetwork(node_id, 20202021)
+    await devCtrl.CommissionOnNetwork(node_id, 20202021)
 
 
 async def read_heater_types_impl(devCtrl, node_id):
