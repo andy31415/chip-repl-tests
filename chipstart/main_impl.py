@@ -23,6 +23,7 @@ __LOG_LEVELS__ = {
 certificateAuthorityManager = None
 chipStack = None
 
+
 def StackShutdown():
     global certificateAuthorityManager
     if not certificateAuthorityManager:
