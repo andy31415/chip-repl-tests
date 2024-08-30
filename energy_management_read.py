@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
-import click
-import chipstart
 import asyncio
+import chipstart
+import click
+import pprint
 
 import chip.clusters as Clusters
 from chip.ChipStack import ChipStack
@@ -15,9 +16,9 @@ async def commission_impl(devCtrl, node_id):
 
 async def read_heater_types_impl(devCtrl, node_id):
     attr = await devCtrl.ReadAttribute(
-        node_id, [Clusters.WaterHeaderManagement.Attributes.HeaterTypes]
+        node_id, [Clusters.WaterHeaterManagement.Attributes.HeaterTypes]
     )
-    print(attr)
+    pprint.pprint(attr)
     devCtrl.Shutdown()
 
 
