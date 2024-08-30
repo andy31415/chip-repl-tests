@@ -3,11 +3,14 @@
 import click
 import chipstart
 import asyncio
+
 import chip.clusters as Clusters
+from chip.ChipStack import ChipStack
 
 
 async def commission_impl(devCtrl, node_id):
     await devCtrl.CommissionOnNetwork(node_id, 20202021)
+    devCtrl.Shutdown()
 
 
 async def read_heater_types_impl(devCtrl, node_id):
@@ -15,6 +18,7 @@ async def read_heater_types_impl(devCtrl, node_id):
         node_id, [Clusters.WaterHeaderManagement.Attributes.HeaterTypes]
     )
     print(attr)
+    devCtrl.Shutdown()
 
 
 @chipstart.main.command()
@@ -37,3 +41,4 @@ def read_heater_types(ctx, node_id):
 
 if __name__ == "__main__":
     chipstart.main()
+    ChipStack.Shutdown()

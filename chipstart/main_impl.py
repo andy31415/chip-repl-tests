@@ -3,6 +3,7 @@ import coloredlogs
 import logging
 import time
 import click
+import atexit
 
 import chip.native
 import chip.logging
@@ -11,9 +12,33 @@ import chip.logging
 import chip.CertificateAuthority
 from chip.ChipStack import ChipStack
 
+__LOG_LEVELS__ = {
+    "debug": logging.DEBUG,
+    "info": logging.INFO,
+    "warn": logging.WARN,
+    "fatal": logging.FATAL,
+}
+
+
+certificateAuthorityManager = None
+chipStack = None
+
+def StackShutdown():
+    global certificateAuthorityManager
+    if not certificateAuthorityManager:
+        return
+    certificateAuthorityManager.Shutdown()
+    chipStack.Shutdown()
+
 
 @click.group()
 @click.pass_context
+@click.option(
+    "--log-level",
+    default="INFO",
+    type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
+    help="Determines the verbosity of script output",
+)
 @click.option(
     "--persistent-storage-json",
     "-p",
@@ -26,11 +51,16 @@ from chip.ChipStack import ChipStack
     default="./credentials/development/paa-root-certs",
     show_default=True,
 )
-def main(ctx, persistent_storage_json, paa_trust_store):
-    coloredlogs.install(level="DEBUG")
+def main(ctx, log_level, persistent_storage_json, paa_trust_store):
+    coloredlogs.install(
+        level=__LOG_LEVELS__[log_level], fmt="%(asctime)s %(levelname)-7s %(message)s"
+    )
     chip.logging.RedirectToPythonLogging()
     logging.getLogger().setLevel(logging.WARN)
     # logging.getLogger().setLevel(logging.INFO)
+
+    global certificateAuthorityManager
+    global chipStack
 
     chip.native.Init()
     chipStack = ChipStack(
@@ -56,3 +86,5 @@ def main(ctx, persistent_storage_json, paa_trust_store):
         "certificateAuthorityManager": certificateAuthorityManager,
         "devCtrl": devCtrl,
     }
+
+    atexit.register(StackShutdown)
