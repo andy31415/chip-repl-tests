@@ -1,7 +1,6 @@
-import asyncio
 import coloredlogs
 import logging
-import time
+import os
 import click
 import atexit
 
@@ -59,6 +58,19 @@ def main(ctx, log_level, persistent_storage_json, paa_trust_store):
     chip.logging.RedirectToPythonLogging()
     logging.getLogger().setLevel(logging.WARN)
     # logging.getLogger().setLevel(logging.INFO)
+
+    if not os.path.exists(paa_trust_store):
+        logging.warning("PAA Path %r does not exist. resetting.", paa_trust_store)
+        PAA_PATHS = [
+            "./credentials/development/paa-root-certs",
+            "../connectedhomeip/credentials/development/paa-root-certs",
+        ]
+        paa_trust_store = ""
+        for path in PAA_PATHS:
+            if not os.path.exists(path):
+                continue
+            logging.warning("PAA Path reset to %r.", paa_trust_store)
+            paa_trust_store = path
 
     global certificateAuthorityManager
     global chipStack

@@ -5,6 +5,7 @@ import coloredlogs
 import logging
 import time
 import click
+import os
 
 import chip.native
 import chip.logging
@@ -109,6 +110,16 @@ def main(ctx):
     logging.getLogger().setLevel(logging.WARN)
     # logging.getLogger().setLevel(logging.INFO)
 
+    PAA_PATHS = [
+        "./credentials/development/paa-root-certs",
+        "../connectedhomeip/credentials/development/paa-root-certs",
+    ]
+    paa_path = ""
+    for path in PAA_PATHS:
+        if not os.path.exists(path):
+            continue
+        paa_path = path
+
     chip.native.Init()
     chipStack = ChipStack(
         persistentStoragePath="/tmp/repl-storage.json", enableServerInteractions=False
@@ -130,7 +141,7 @@ def main(ctx):
     devCtrl = (
         caList[0]
         .adminList[0]
-        .NewController(paaTrustStorePath="./credentials/development/paa-root-certs")
+        .NewController(paaTrustStorePath=paa_path)
     )
     ctx.obj = {
         "chipStack": chipStack,
