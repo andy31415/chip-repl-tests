@@ -70,8 +70,8 @@ def main(ctx, log_level, persistent_storage_json, paa_trust_store):
         level=__LOG_LEVELS__[log_level], fmt="%(asctime)s %(levelname)-7s %(message)s"
     )
     matter.logging.RedirectToPythonLogging()
-    # logging.getLogger().setLevel(logging.WARN)
-    logging.getLogger().setLevel(logging.INFO)
+    logging.getLogger().setLevel(logging.WARN)
+    # logging.getLogger().setLevel(logging.INFO)
 
     if not os.path.exists(paa_trust_store):
         raise Exception(f"paa_trust_store not found: {paa_trust_store}")
