@@ -5,12 +5,12 @@ import time
 import click
 import atexit
 
-import chip.native
-import chip.logging
+import matter.native
+import matter.logging
 
-# import chip.FabricAdmin
-import chip.CertificateAuthority
-from chip.ChipStack import ChipStack
+# import matter.FabricAdmin
+import matter.CertificateAuthority
+from matter.ChipStack import ChipStack
 
 __LOG_LEVELS__ = {
     "debug": logging.DEBUG,
@@ -56,18 +56,18 @@ def main(ctx, log_level, persistent_storage_json, paa_trust_store):
     coloredlogs.install(
         level=__LOG_LEVELS__[log_level], fmt="%(asctime)s %(levelname)-7s %(message)s"
     )
-    chip.logging.RedirectToPythonLogging()
+    matter.logging.RedirectToPythonLogging()
     logging.getLogger().setLevel(logging.WARN)
     # logging.getLogger().setLevel(logging.INFO)
 
     global certificateAuthorityManager
     global chipStack
 
-    chip.native.Init()
+    matter.native.Init()
     chipStack = ChipStack(
         persistentStoragePath=persistent_storage_json, enableServerInteractions=False
     )
-    certificateAuthorityManager = chip.CertificateAuthority.CertificateAuthorityManager(
+    certificateAuthorityManager = matter.CertificateAuthority.CertificateAuthorityManager(
         chipStack, chipStack.GetStorageManager()
     )
 

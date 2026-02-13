@@ -5,8 +5,8 @@ import chipstart
 import click
 import pprint
 
-import chip.clusters as Clusters
-from chip.ChipStack import ChipStack
+import matter.clusters as Clusters
+from matter.ChipStack import ChipStack
 
 
 async def commission_impl(devCtrl, node_id):

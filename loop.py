@@ -6,12 +6,12 @@ import logging
 import time
 import click
 
-import chip.native
-import chip.logging
-import chip.clusters as Clusters
-import chip.FabricAdmin
-import chip.CertificateAuthority
-from chip.ChipStack import ChipStack
+import matter.native
+import matter.logging
+import matter.clusters as Clusters
+import matter.FabricAdmin
+import matter.CertificateAuthority
+from matter.ChipStack import ChipStack
 
 NODE_ID = 1234
 
@@ -85,7 +85,7 @@ async def run_toggle_loop(devCtrl):
         print("TEST DURATION: %s" % (time.time() - test_start))
 
 
-async def read_heap(devCtrl):
+asyncmatterdef read_heap(devCtrl):
     global NODE_ID
     attr = await devCtrl.ReadAttribute(
         NODE_ID, [Clusters.SoftwareDiagnostics.Attributes.CurrentHeapFree]
@@ -105,15 +105,15 @@ async def commission(devCtrl):
 @click.pass_context
 def main(ctx):
     coloredlogs.install(level="DEBUG")
-    chip.logging.RedirectToPythonLogging()
+    matter.logging.RedirectToPythonLogging()
     logging.getLogger().setLevel(logging.WARN)
     # logging.getLogger().setLevel(logging.INFO)
 
-    chip.native.Init()
+    matter.native.Init()
     chipStack = ChipStack(
         persistentStoragePath="/tmp/repl-storage.json", enableServerInteractions=False
     )
-    certificateAuthorityManager = chip.CertificateAuthority.CertificateAuthorityManager(
+    certificateAuthorityManager = matter.CertificateAuthority.CertificateAuthorityManager(
         chipStack, chipStack.GetStorageManager()
     )
 
