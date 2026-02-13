@@ -24,12 +24,12 @@ def pretty_print(attributes_map):
             ):
                 name = a.__name__
                 if hasattr(a, "attribute_id"):
-                    name = f"{name} ({a.attribute_id})"
+                    name = f"{name} / {a.attribute_id}"
                 try:
                     value = "%r" % a.value
                 except Exception:
                     # TODO: I am unable to decode lists ... why?!?
-                    value = "N/A"
+                    value = "%s" % a
 
                 print(f"    {name:30s}: {value}")
 
