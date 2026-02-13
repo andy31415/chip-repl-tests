@@ -14,10 +14,30 @@ async def commission_impl(devCtrl, node_id):
     devCtrl.Shutdown()
 
 
+def pretty_print(attributes_map):
+    for endpoint_id, data in attributes_map.items():
+        print(f"ENDPOINT {endpoint_id}:")
+        for cluster, attrs in sorted(data.items(), key=lambda x: x[0].id):
+            print(f"  {cluster.__name__}:")
+            for a in sorted(
+                attrs, key=lambda x: x.attribute_id if hasattr(x, "attribute_id") else 0
+            ):
+                name = a.__name__
+                if hasattr(a, "attribute_id"):
+                    name = f"{name} ({a.attribute_id})"
+                try:
+                    value = "%r" % a.value
+                except Exception:
+                    # TODO: I am unable to decode lists ... why?!?
+                    value = "N/A"
+
+                print(f"    {name:30s}: {value}")
+
+
 async def read_all_impl(devCtrl, node_id, endpoint: None | int):
-    path = [(endpoint)] if endpoint is not None else [('*')]
+    path = [endpoint] if endpoint is not None else ["*"]
     attr = await devCtrl.ReadAttribute(node_id, path)
-    pprint.pprint(attr)
+    pretty_print(attr)
     devCtrl.Shutdown()
 
 
