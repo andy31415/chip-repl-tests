@@ -26,7 +26,7 @@ async def read_failure_impl(devCtrl, node_id):
 @click.pass_context
 @click.option("--node-id", "-n", default=1234, show_default=True)
 def commission(ctx, node_id):
-    asyncio.get_event_loop().run_until_complete(
+    ctx.obj["loop"].run_until_complete(
         commission_impl(ctx.obj["devCtrl"], node_id)
     )
 
@@ -35,7 +35,7 @@ def commission(ctx, node_id):
 @click.pass_context
 @click.option("--node-id", "-n", default=1234, show_default=True)
 def read_failure(ctx, node_id):
-    asyncio.get_event_loop().run_until_complete(
+    ctx.obj["loop"].run_until_complete(
         read_failure_impl(ctx.obj["devCtrl"], node_id)
     )
 

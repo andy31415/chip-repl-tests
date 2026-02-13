@@ -11,6 +11,7 @@ import matter.logging
 # import matter.FabricAdmin
 import matter.CertificateAuthority
 from matter.ChipStack import ChipStack
+from matter.storage import PersistentStorageJSON
 
 __LOG_LEVELS__ = {
     "debug": logging.DEBUG,
@@ -65,7 +66,8 @@ def main(ctx, log_level, persistent_storage_json, paa_trust_store):
 
     matter.native.Init()
     chipStack = ChipStack(
-        persistentStoragePath=persistent_storage_json, enableServerInteractions=False
+        persistentStorage=PersistentStorageJSON(persistent_storage_json),
+        enableServerInteractions=False
     )
     certificateAuthorityManager = matter.CertificateAuthority.CertificateAuthorityManager(
         chipStack, chipStack.GetStorageManager()
@@ -86,6 +88,7 @@ def main(ctx, log_level, persistent_storage_json, paa_trust_store):
         "chipStack": chipStack,
         "certificateAuthorityManager": certificateAuthorityManager,
         "devCtrl": devCtrl,
+        "loop": asyncio.new_event_loop(),
     }
 
     atexit.register(StackShutdown)
