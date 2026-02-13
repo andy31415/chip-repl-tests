@@ -4,6 +4,7 @@ import logging
 import time
 import click
 import atexit
+import os
 
 import matter.native
 import matter.logging
@@ -32,6 +33,17 @@ def StackShutdown():
     certificateAuthorityManager.Shutdown()
     chipStack.Shutdown()
 
+def paa_root_path() -> str:
+    choices = [
+            "./credentials/development/paa-root-certs",
+            "../connectedhomeip/credentials/development/paa-root-certs",
+            "/home/andrei/connectedhomeip/credentials/development/paa-root-certs"
+    ]
+    for c in choices:
+        if os.path.exists(c):
+            return c
+
+
 
 @click.group()
 @click.pass_context
@@ -50,7 +62,7 @@ def StackShutdown():
 @click.option(
     "--paa-trust-store",
     "-t",
-    default="./credentials/development/paa-root-certs",
+    default=paa_root_path(),
     show_default=True,
 )
 def main(ctx, log_level, persistent_storage_json, paa_trust_store):
@@ -58,8 +70,11 @@ def main(ctx, log_level, persistent_storage_json, paa_trust_store):
         level=__LOG_LEVELS__[log_level], fmt="%(asctime)s %(levelname)-7s %(message)s"
     )
     matter.logging.RedirectToPythonLogging()
-    logging.getLogger().setLevel(logging.WARN)
-    # logging.getLogger().setLevel(logging.INFO)
+    # logging.getLogger().setLevel(logging.WARN)
+    logging.getLogger().setLevel(logging.INFO)
+
+    if not os.path.exists(paa_trust_store):
+        raise Exception(f"paa_trust_store not found: {paa_trust_store}")
 
     global certificateAuthorityManager
     global chipStack
