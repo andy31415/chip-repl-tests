@@ -33,16 +33,16 @@ def StackShutdown():
     certificateAuthorityManager.Shutdown()
     chipStack.Shutdown()
 
+
 def paa_root_path() -> str:
     choices = [
-            "./credentials/development/paa-root-certs",
-            "../connectedhomeip/credentials/development/paa-root-certs",
-            "/home/andrei/connectedhomeip/credentials/development/paa-root-certs"
+        "./credentials/development/paa-root-certs",
+        "../connectedhomeip/credentials/development/paa-root-certs",
+        "/home/andrei/connectedhomeip/credentials/development/paa-root-certs",
     ]
     for c in choices:
         if os.path.exists(c):
             return c
-
 
 
 @click.group()
@@ -82,10 +82,12 @@ def main(ctx, log_level, persistent_storage_json, paa_trust_store):
     matter.native.Init()
     chipStack = ChipStack(
         persistentStorage=PersistentStorageJSON(persistent_storage_json),
-        enableServerInteractions=False
+        enableServerInteractions=False,
     )
-    certificateAuthorityManager = matter.CertificateAuthority.CertificateAuthorityManager(
-        chipStack, chipStack.GetStorageManager()
+    certificateAuthorityManager = (
+        matter.CertificateAuthority.CertificateAuthorityManager(
+            chipStack, chipStack.GetStorageManager()
+        )
     )
 
     certificateAuthorityManager.LoadAuthoritiesFromStorage()

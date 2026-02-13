@@ -85,7 +85,7 @@ async def run_toggle_loop(devCtrl):
         print("TEST DURATION: %s" % (time.time() - test_start))
 
 
-asyncmatterdef read_heap(devCtrl):
+async def read_heap(devCtrl):
     global NODE_ID
     attr = await devCtrl.ReadAttribute(
         NODE_ID, [Clusters.SoftwareDiagnostics.Attributes.CurrentHeapFree]
@@ -113,8 +113,10 @@ def main(ctx):
     chipStack = ChipStack(
         persistentStoragePath="/tmp/repl-storage.json", enableServerInteractions=False
     )
-    certificateAuthorityManager = matter.CertificateAuthority.CertificateAuthorityManager(
-        chipStack, chipStack.GetStorageManager()
+    certificateAuthorityManager = (
+        matter.CertificateAuthority.CertificateAuthorityManager(
+            chipStack, chipStack.GetStorageManager()
+        )
     )
 
     certificateAuthorityManager.LoadAuthoritiesFromStorage()
