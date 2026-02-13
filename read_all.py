@@ -19,17 +19,13 @@ def pretty_print(attributes_map):
         print(f"ENDPOINT {endpoint_id}:")
         for cluster, attrs in sorted(data.items(), key=lambda x: x[0].id):
             print(f"  {cluster.__name__}:")
-            for a in sorted(
-                attrs, key=lambda x: x.attribute_id if hasattr(x, "attribute_id") else 0
+            for a, value in sorted(
+                attrs.items(),
+                key=lambda x: x.attribute_id if hasattr(x, "attribute_id") else 0,
             ):
                 name = a.__name__
                 if hasattr(a, "attribute_id"):
                     name = f"{name} / {a.attribute_id}"
-                try:
-                    value = "%r" % a.value
-                except Exception:
-                    # TODO: I am unable to decode lists ... why?!?
-                    value = "%s" % a
 
                 print(f"    {name:30s}: {value}")
 
