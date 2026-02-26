@@ -4,6 +4,7 @@ import asyncio
 import chipstart
 import click
 import pprint
+import inspect
 
 import matter.clusters as Clusters
 from matter.ChipStack import ChipStack
@@ -30,9 +31,45 @@ def pretty_print(attributes_map):
                 print(f"    {name:30s}: {value}")
 
 
-async def read_all_impl(devCtrl, node_id, endpoint: None | int):
-    path = [endpoint] if endpoint is not None else ["*"]
-    attr = await devCtrl.ReadAttribute(node_id, path)
+async def read_all_impl(devCtrl, node_id, endpoint: tuple[int], cluster: tuple[str]):
+    cluster_names = set()
+    cluster_ids = set()
+    for c in cluster:
+        try:
+            cluster_ids.add(int(c))
+        except ValueError:
+            cluster_names.add(c)
+
+    cluster_types = []
+    if len(cluster):
+        for name, cl in inspect.getmembers(Clusters, inspect.isclass):
+            if not hasattr(cl, "id"):
+                continue
+            if name in cluster_names:
+                cluster_types.append(cl)
+                cluster_names.remove(name)
+                continue
+            if cl.id in cluster_ids:
+                cluster_types.append(cl)
+                cluster_ids.remove(cl.id)
+                continue
+
+    if cluster_names:
+        print("Unknown cluster name(s): %r" % cluster_names)
+
+    if cluster_ids:
+        print("Unknown cluster id(s): %r" % cluster_ids)
+
+    paths = []
+    if not len(endpoint):
+        if cluster_types:
+            paths = cluster_types  # typle of cluster rs, wildcard endpoint
+        else:
+            paths = ["*"]
+    else:
+        paths = [(e, c) for e in endpoint for c in cluster_types]
+
+    attr = await devCtrl.ReadAttribute(node_id, paths)
     pretty_print(attr)
     devCtrl.Shutdown()
 
@@ -47,10 +84,19 @@ def commission(ctx, node_id):
 @chipstart.main.command()
 @click.pass_context
 @click.option("--node-id", "-n", default=1234, show_default=True)
-@click.option("--endpoint", "-e", default=None, type=int, show_default=True)
-def read_all(ctx, node_id, endpoint):
+@click.option("--endpoint", "-e", type=int, show_default=True, multiple=True)
+@click.option(
+    "--cluster",
+    "-c",
+    default=None,
+    type=str,
+    show_default=True,
+    multiple=True,
+    help="Filter for specific clsuter (either by ID or by name)",
+)
+def read_all(ctx, node_id, endpoint: tuple[int], cluster: tuple[str]):
     ctx.obj["loop"].run_until_complete(
-        read_all_impl(ctx.obj["devCtrl"], node_id, endpoint)
+        read_all_impl(ctx.obj["devCtrl"], node_id, endpoint, cluster)
     )
 
 
