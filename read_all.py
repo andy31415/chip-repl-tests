@@ -22,7 +22,7 @@ def pretty_print(attributes_map):
             print(f"  {cluster.__name__} / {cluster.id}:")
             for a, value in sorted(
                 attrs.items(),
-                key=lambda x: x.attribute_id if hasattr(x, "attribute_id") else 0,
+                key=lambda x: x[0].attribute_id if hasattr(x[0], "attribute_id") else 0,
             ):
                 name = a.__name__
                 if hasattr(a, "attribute_id"):
