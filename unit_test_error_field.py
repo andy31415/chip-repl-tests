@@ -14,9 +14,9 @@ async def commission_impl(devCtrl, node_id):
     devCtrl.Shutdown()
 
 
-async def read_heater_types_impl(devCtrl, node_id):
+async def read_failure_impl(devCtrl, node_id):
     attr = await devCtrl.ReadAttribute(
-        node_id, [Clusters.WaterHeaterManagement.Attributes.HeaterTypes]
+        node_id, [(1, Clusters.UnitTesting.Attributes.FailureInt32U)]
     )
     pprint.pprint(attr)
     devCtrl.Shutdown()
@@ -32,10 +32,8 @@ def commission(ctx, node_id):
 @chipstart.main.command()
 @click.pass_context
 @click.option("--node-id", "-n", default=1234, show_default=True)
-def read_heater_types(ctx, node_id):
-    ctx.obj["loop"].run_until_complete(
-        read_heater_types_impl(ctx.obj["devCtrl"], node_id)
-    )
+def read_failure(ctx, node_id):
+    ctx.obj["loop"].run_until_complete(read_failure_impl(ctx.obj["devCtrl"], node_id))
 
 
 if __name__ == "__main__":

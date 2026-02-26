@@ -3,13 +3,15 @@ import logging
 import os
 import click
 import atexit
+import os
 
-import chip.native
-import chip.logging
+import matter.native
+import matter.logging
 
-# import chip.FabricAdmin
-import chip.CertificateAuthority
-from chip.ChipStack import ChipStack
+# import matter.FabricAdmin
+import matter.CertificateAuthority
+from matter.ChipStack import ChipStack
+from matter.storage import PersistentStorageJSON
 
 __LOG_LEVELS__ = {
     "debug": logging.DEBUG,
@@ -31,6 +33,17 @@ def StackShutdown():
     chipStack.Shutdown()
 
 
+def paa_root_path() -> str:
+    choices = [
+        "./credentials/development/paa-root-certs",
+        "../connectedhomeip/credentials/development/paa-root-certs",
+        "/home/andrei/connectedhomeip/credentials/development/paa-root-certs",
+    ]
+    for c in choices:
+        if os.path.exists(c):
+            return c
+
+
 @click.group()
 @click.pass_context
 @click.option(
@@ -48,14 +61,14 @@ def StackShutdown():
 @click.option(
     "--paa-trust-store",
     "-t",
-    default="./credentials/development/paa-root-certs",
+    default=paa_root_path(),
     show_default=True,
 )
 def main(ctx, log_level, persistent_storage_json, paa_trust_store):
     coloredlogs.install(
         level=__LOG_LEVELS__[log_level], fmt="%(asctime)s %(levelname)-7s %(message)s"
     )
-    chip.logging.RedirectToPythonLogging()
+    matter.logging.RedirectToPythonLogging()
     logging.getLogger().setLevel(logging.WARN)
     # logging.getLogger().setLevel(logging.INFO)
 
@@ -75,12 +88,15 @@ def main(ctx, log_level, persistent_storage_json, paa_trust_store):
     global certificateAuthorityManager
     global chipStack
 
-    chip.native.Init()
+    matter.native.Init()
     chipStack = ChipStack(
-        persistentStoragePath=persistent_storage_json, enableServerInteractions=False
+        persistentStorage=PersistentStorageJSON(persistent_storage_json),
+        enableServerInteractions=False,
     )
-    certificateAuthorityManager = chip.CertificateAuthority.CertificateAuthorityManager(
-        chipStack, chipStack.GetStorageManager()
+    certificateAuthorityManager = (
+        matter.CertificateAuthority.CertificateAuthorityManager(
+            chipStack, chipStack.GetStorageManager()
+        )
     )
 
     certificateAuthorityManager.LoadAuthoritiesFromStorage()
@@ -98,6 +114,7 @@ def main(ctx, log_level, persistent_storage_json, paa_trust_store):
         "chipStack": chipStack,
         "certificateAuthorityManager": certificateAuthorityManager,
         "devCtrl": devCtrl,
+        "loop": asyncio.new_event_loop(),
     }
 
     atexit.register(StackShutdown)
