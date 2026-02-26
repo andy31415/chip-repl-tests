@@ -19,7 +19,7 @@ def pretty_print(attributes_map):
     for endpoint_id, data in attributes_map.items():
         print(f"ENDPOINT {endpoint_id}:")
         for cluster, attrs in sorted(data.items(), key=lambda x: x[0].id):
-            print(f"  {cluster.__name__}:")
+            print(f"  {cluster.__name__} / {cluster.id}:")
             for a, value in sorted(
                 attrs.items(),
                 key=lambda x: x.attribute_id if hasattr(x, "attribute_id") else 0,
