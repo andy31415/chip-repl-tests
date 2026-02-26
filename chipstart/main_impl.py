@@ -3,7 +3,7 @@ import logging
 import os
 import click
 import atexit
-import os
+import asyncio
 
 import matter.native
 import matter.logging
