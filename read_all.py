@@ -16,7 +16,7 @@ async def commission_impl(devCtrl, node_id):
 
 
 def pretty_print(attributes_map):
-    for endpoint_id, data in attributes_map.items():
+    for endpoint_id, data in sorted(attributes_map.items(), key=lambda x: x[0]):
         print(f"ENDPOINT {endpoint_id}:")
         for cluster, attrs in sorted(data.items(), key=lambda x: x[0].id):
             print(f"  {cluster.__name__} / {cluster.id}:")
