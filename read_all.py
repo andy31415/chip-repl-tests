@@ -67,7 +67,10 @@ async def read_all_impl(devCtrl, node_id, endpoint: tuple[int], cluster: tuple[s
         else:
             paths = ["*"]
     else:
-        paths = [(e, c) for e in endpoint for c in cluster_types]
+        if not len(cluster_types):
+            paths = endpoint
+        else:
+            paths = [(e, c) for e in endpoint for c in cluster_types]
 
     attr = await devCtrl.ReadAttribute(node_id, paths)
     pretty_print(attr)
